@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+body {
+  background-color: #faf9f7;
+  color: #111111;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.prose-post {
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.85;
+  font-size: 1.0625rem;
+  white-space: pre-wrap;
+}
