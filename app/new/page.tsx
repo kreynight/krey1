@@ -3,10 +3,70 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+type TagOption = { value: string; label: string }
+
+const SOURCE_OPTIONS: TagOption[] = [
+  { value: 'first_hand',   label: 'First-hand experience' },
+  { value: 'observation',  label: 'Observation' },
+  { value: 'research',     label: 'Research-based' },
+  { value: 'hypothetical', label: 'Hypothetical' },
+]
+
+const CONFIDENCE_OPTIONS: TagOption[] = [
+  { value: 'exploring',          label: 'Exploring' },
+  { value: 'somewhat_confident', label: 'Somewhat confident' },
+  { value: 'strong_conviction',  label: 'Strong conviction' },
+  { value: 'open_to_change',     label: 'Open to being changed' },
+]
+
+const DEBATE_OPTIONS: TagOption[] = [
+  { value: 'open_to_debate',     label: 'Open to debate' },
+  { value: 'neutral',            label: 'Just sharing' },
+  { value: 'seeking_opposition', label: 'Seeking strong opposition' },
+  { value: 'not_debating',       label: 'Not looking to debate' },
+]
+
+function TagGroup({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string
+  options: TagOption[]
+  value: string
+  onChange: (v: string) => void
+}) {
+  return (
+    <div>
+      <p className="text-xs text-stone-400 mb-2">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map(opt => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(value === opt.value ? '' : opt.value)}
+            className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+              value === opt.value
+                ? 'border-stone-700 bg-stone-900 text-white'
+                : 'border-stone-200 text-stone-500 hover:border-stone-400 hover:text-stone-700'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function NewPostPage() {
   const [topic, setTopic] = useState('')
   const [body, setBody] = useState('')
   const [signature, setSignature] = useState('')
+  const [sourceType, setSourceType] = useState('')
+  const [confidenceLevel, setConfidenceLevel] = useState('')
+  const [debateIntent, setDebateIntent] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -20,9 +80,12 @@ export default function NewPostPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        topic: topic.trim(),
-        body: body.trim(),
-        signature: signature.trim() || null,
+        topic:            topic.trim(),
+        body:             body.trim(),
+        signature:        signature.trim() || null,
+        source_type:      sourceType || null,
+        confidence_level: confidenceLevel || null,
+        debate_intent:    debateIntent || null,
       }),
     })
 
@@ -78,6 +141,30 @@ export default function NewPostPage() {
             placeholder="Write your philosophy here…"
           />
           <p className="mt-1 text-xs text-stone-400 text-right">{body.length}/10,000</p>
+        </div>
+
+        <div className="border border-stone-200 rounded-md p-4 space-y-4">
+          <p className="text-xs uppercase tracking-wider text-stone-400 font-medium">
+            Context <span className="normal-case font-normal">(optional)</span>
+          </p>
+          <TagGroup
+            label="Source of perspective"
+            options={SOURCE_OPTIONS}
+            value={sourceType}
+            onChange={setSourceType}
+          />
+          <TagGroup
+            label="Confidence level"
+            options={CONFIDENCE_OPTIONS}
+            value={confidenceLevel}
+            onChange={setConfidenceLevel}
+          />
+          <TagGroup
+            label="Debate intent"
+            options={DEBATE_OPTIONS}
+            value={debateIntent}
+            onChange={setDebateIntent}
+          />
         </div>
 
         <div>

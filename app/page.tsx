@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import PostTags from '@/components/PostTags'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +9,11 @@ export default async function FeedPage() {
 
   const { data: posts } = await supabase
     .from('posts')
-    .select('id, post_number, topic, body, likes_count, comments_count, created_at, signature')
+    .select(`
+      id, post_number, topic, body, comments_count, created_at, signature,
+      agree_count, thought_provoking_count, appreciate_count, curious_count,
+      source_type, confidence_level, debate_intent
+    `)
     .order('post_number', { ascending: true })
     .limit(50)
 
@@ -45,31 +50,41 @@ export default async function FeedPage() {
         </div>
       ) : (
         <div className="space-y-px">
-          {posts.map((post) => (
-            <article key={post.id} className="group border-t border-stone-200 py-6">
-              <div className="flex items-start gap-4">
-                <span className="font-mono text-xs text-stone-300 pt-0.5 w-14 shrink-0 text-right">
-                  #{post.post_number.toLocaleString()}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <Link href={`/post/${post.id}`} className="block">
-                    <h2 className="text-lg font-semibold text-stone-900 group-hover:text-stone-600 transition-colors leading-snug mb-2">
-                      Philosophy of {post.topic}
-                    </h2>
-                  </Link>
-                  <p className="text-stone-500 text-sm line-clamp-2 leading-relaxed">
-                    {post.body}
-                  </p>
-                  <div className="mt-3 flex items-center gap-4 text-xs text-stone-400">
-                    <span className="font-medium">{post.signature || 'Anonymous'}</span>
-                    <span>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                    <span>{post.likes_count} {post.likes_count === 1 ? 'like' : 'likes'}</span>
-                    <span>{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</span>
+          {posts.map((post) => {
+            const totalReactions =
+              post.agree_count + post.thought_provoking_count +
+              post.appreciate_count + post.curious_count
+            return (
+              <article key={post.id} className="group border-t border-stone-200 py-6">
+                <div className="flex items-start gap-4">
+                  <span className="font-mono text-xs text-stone-300 pt-0.5 w-14 shrink-0 text-right">
+                    #{post.post_number.toLocaleString()}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <Link href={`/post/${post.id}`} className="block">
+                      <h2 className="text-lg font-semibold text-stone-900 group-hover:text-stone-600 transition-colors leading-snug mb-1">
+                        Philosophy of {post.topic}
+                      </h2>
+                    </Link>
+                    <PostTags
+                      sourceType={post.source_type}
+                      confidenceLevel={post.confidence_level}
+                      debateIntent={post.debate_intent}
+                    />
+                    <p className="text-stone-500 text-sm line-clamp-2 leading-relaxed">
+                      {post.body}
+                    </p>
+                    <div className="mt-3 flex items-center gap-4 text-xs text-stone-400">
+                      <span className="font-medium">{post.signature || 'Anonymous'}</span>
+                      <span>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      {totalReactions > 0 && <span>{totalReactions} {totalReactions === 1 ? 'reaction' : 'reactions'}</span>}
+                      <span>{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            )
+          })}
         </div>
       )}
     </div>

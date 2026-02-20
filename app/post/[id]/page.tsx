@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import LikeButton from '@/components/LikeButton'
+import ReactionBar from '@/components/ReactionBar'
 import CommentSection from '@/components/CommentSection'
+import PostTags from '@/components/PostTags'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,11 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
   const { data: post } = await supabase
     .from('posts')
-    .select('id, post_number, topic, body, likes_count, comments_count, created_at, signature')
+    .select(`
+      id, post_number, topic, body, comments_count, created_at, signature,
+      agree_count, thought_provoking_count, appreciate_count, curious_count,
+      source_type, confidence_level, debate_intent
+    `)
     .eq('id', id)
     .single()
 
@@ -35,7 +40,12 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-stone-900 leading-tight">
           Philosophy of {post.topic}
         </h1>
-        <div className="mt-3 flex items-center gap-3 text-sm text-stone-400">
+        <PostTags
+          sourceType={post.source_type}
+          confidenceLevel={post.confidence_level}
+          debateIntent={post.debate_intent}
+        />
+        <div className="mt-2 flex items-center gap-3 text-sm text-stone-400">
           <span className="font-medium text-stone-600">{post.signature || 'Anonymous'}</span>
           <span>·</span>
           <time>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>
@@ -47,10 +57,16 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         {post.body}
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-stone-200 pt-6 mb-8 flex items-center gap-6">
-        <LikeButton postId={post.id} initialLikes={post.likes_count} />
-        <span className="text-sm text-stone-400">{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</span>
+      {/* Reactions + comment count */}
+      <div className="border-t border-stone-200 pt-6 mb-8 space-y-3">
+        <ReactionBar
+          postId={post.id}
+          agreeCount={post.agree_count}
+          thoughtProvokingCount={post.thought_provoking_count}
+          appreciateCount={post.appreciate_count}
+          curiousCount={post.curious_count}
+        />
+        <p className="text-xs text-stone-400">{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</p>
       </div>
 
       {/* Comments */}
