@@ -134,13 +134,15 @@ export default function NewPostPage() {
             id="body"
             required
             rows={10}
-            maxLength={10000}
+            maxLength={1000}
             value={body}
             onChange={e => setBody(e.target.value)}
             className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400 resize-y leading-relaxed"
             placeholder="Write your philosophy here…"
           />
-          <p className="mt-1 text-xs text-stone-400 text-right">{body.length}/10,000</p>
+          <p className={`mt-1 text-xs text-right ${body.length >= 950 ? 'text-red-500' : 'text-stone-400'}`}>
+            {body.length}/1,000
+          </p>
         </div>
 
         <div className="border border-stone-200 rounded-md p-4 space-y-4">

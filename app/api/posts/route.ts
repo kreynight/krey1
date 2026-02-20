@@ -10,6 +10,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Topic and body are required' }, { status: 400 })
   }
 
+  if (body.trim().length > 1000) {
+    return NextResponse.json({ error: 'Post body must be 1,000 characters or fewer' }, { status: 400 })
+  }
+
   const { data: postNumber, error: fnError } = await supabase.rpc('claim_post_number')
   if (fnError || postNumber === null) {
     return NextResponse.json(
