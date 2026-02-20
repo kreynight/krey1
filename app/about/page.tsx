@@ -5,16 +5,19 @@ export default function AboutPage() {
 
       <div className="space-y-5 text-stone-700 leading-relaxed">
         <p>
-          I&apos;ve always wanted a space where people can share how they truly see the world.
-          Philosophy Of is that space. A forum to communicate perspective openly, challenge
+          based in south fl.
+        </p>
+        <p>
+          i&apos;ve always wanted a space where people can share how they truly see the world.
+          Philosophy Of is that space. a forum to communicate perspective openly, challenge
           ideas respectfully, and debate in a healthy way.
         </p>
         <p>
-          I&apos;m based in Miami. This is a long-term experiment in thoughtful conversation.
-          If it resonates with you, contribute.
+          this is a long-term experiment in thoughtful conversation.
+          if it resonates with you, contribute.
         </p>
         <p className="text-stone-400 text-sm">
-          Perspective is personal. Disagreement is welcome.
+          perspective is personal. disagreement is welcome.
         </p>
       </div>
 
