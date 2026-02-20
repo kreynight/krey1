@@ -12,7 +12,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
   const { data: post } = await supabase
     .from('posts')
-    .select('id, post_number, topic, title, body, likes_count, comments_count, created_at, signature')
+    .select('id, post_number, topic, body, likes_count, comments_count, created_at, signature')
     .eq('id', id)
     .single()
 
@@ -31,15 +31,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         <Link href="/" className="text-xs text-stone-400 hover:text-stone-700 transition-colors">
           ← Feed
         </Link>
-        <div className="mt-4 flex items-center gap-2">
-          <span className="font-mono text-xs text-stone-300">#{post.post_number.toLocaleString()}</span>
-          <span className="text-stone-200">·</span>
-          <p className="text-xs uppercase tracking-wider text-stone-400 font-medium">
-            Philosophy of {post.topic}
-          </p>
-        </div>
+        <p className="mt-4 font-mono text-xs text-stone-300">#{post.post_number.toLocaleString()}</p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-stone-900 leading-tight">
-          {post.title}
+          Philosophy of {post.topic}
         </h1>
         <div className="mt-3 flex items-center gap-3 text-sm text-stone-400">
           <span className="font-medium text-stone-600">{post.signature || 'Anonymous'}</span>

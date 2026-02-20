@@ -4,10 +4,10 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const supabase = await createClient()
 
-  const { topic, title, body, signature } = await request.json()
+  const { topic, body, signature } = await request.json()
 
-  if (!topic?.trim() || !title?.trim() || !body?.trim()) {
-    return NextResponse.json({ error: 'Topic, title, and body are required' }, { status: 400 })
+  if (!topic?.trim() || !body?.trim()) {
+    return NextResponse.json({ error: 'Topic and body are required' }, { status: 400 })
   }
 
   const { data: postNumber, error: fnError } = await supabase.rpc('claim_post_number')
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     .insert({
       post_number: postNumber,
       topic: topic.trim(),
-      title: title.trim(),
+      title: topic.trim(),
       body: body.trim(),
       signature: signature?.trim() || null,
     })

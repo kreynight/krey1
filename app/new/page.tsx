@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 
 export default function NewPostPage() {
   const [topic, setTopic] = useState('')
-  const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [signature, setSignature] = useState('')
   const [error, setError] = useState('')
@@ -22,7 +21,6 @@ export default function NewPostPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         topic: topic.trim(),
-        title: title.trim(),
         body: body.trim(),
         signature: signature.trim() || null,
       }),
@@ -63,22 +61,6 @@ export default function NewPostPage() {
             />
           </div>
           <p className="mt-1 text-xs text-stone-400">e.g. "being late", "small talk", "quitting", "risk"</p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1.5 text-stone-700" htmlFor="title">
-            Title
-          </label>
-          <input
-            id="title"
-            type="text"
-            required
-            maxLength={150}
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
-            placeholder="Lateness is a form of optimism"
-          />
         </div>
 
         <div>

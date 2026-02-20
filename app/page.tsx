@@ -8,7 +8,7 @@ export default async function FeedPage() {
 
   const { data: posts } = await supabase
     .from('posts')
-    .select('id, post_number, topic, title, body, likes_count, comments_count, created_at, signature')
+    .select('id, post_number, topic, body, likes_count, comments_count, created_at, signature')
     .order('post_number', { ascending: true })
     .limit(50)
 
@@ -52,12 +52,9 @@ export default async function FeedPage() {
                   #{post.post_number.toLocaleString()}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs uppercase tracking-wider text-stone-400 mb-1 font-medium">
-                    Philosophy of {post.topic}
-                  </p>
                   <Link href={`/post/${post.id}`} className="block">
                     <h2 className="text-lg font-semibold text-stone-900 group-hover:text-stone-600 transition-colors leading-snug mb-2">
-                      {post.title}
+                      Philosophy of {post.topic}
                     </h2>
                   </Link>
                   <p className="text-stone-500 text-sm line-clamp-2 leading-relaxed">
