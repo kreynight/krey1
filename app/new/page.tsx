@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function NewPostPage() {
@@ -10,16 +9,7 @@ export default function NewPostPage() {
   const [body, setBody] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [authed, setAuthed] = useState<boolean | null>(null)
   const router = useRouter()
-  const supabase = createClient()
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setAuthed(!!data.user)
-      if (!data.user) router.push('/auth/signin')
-    })
-  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,8 +30,6 @@ export default function NewPostPage() {
       router.push(`/post/${data.id}`)
     }
   }
-
-  if (authed === null) return null
 
   return (
     <div className="max-w-xl mx-auto">

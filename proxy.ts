@@ -24,7 +24,13 @@ export async function proxy(request: NextRequest) {
   )
 
   // Refresh session — do not remove this
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Protect pages that require authentication
+  const { pathname } = request.nextUrl
+  if (!user && pathname.startsWith('/new')) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
+  }
 
   return supabaseResponse
 }
