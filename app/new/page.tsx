@@ -7,6 +7,7 @@ export default function NewPostPage() {
   const [topic, setTopic] = useState('')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [signature, setSignature] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -19,7 +20,12 @@ export default function NewPostPage() {
     const res = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic: topic.trim(), title: title.trim(), body: body.trim() }),
+      body: JSON.stringify({
+        topic: topic.trim(),
+        title: title.trim(),
+        body: body.trim(),
+        signature: signature.trim() || null,
+      }),
     })
 
     const data = await res.json()
@@ -90,6 +96,22 @@ export default function NewPostPage() {
             placeholder="Write your philosophy here…"
           />
           <p className="mt-1 text-xs text-stone-400 text-right">{body.length}/10,000</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1.5 text-stone-700" htmlFor="signature">
+            Signature <span className="text-stone-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="signature"
+            type="text"
+            maxLength={50}
+            value={signature}
+            onChange={e => setSignature(e.target.value)}
+            className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
+            placeholder="How you'd like to be known"
+          />
+          <p className="mt-1 text-xs text-stone-400">Leave blank to post anonymously</p>
         </div>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}

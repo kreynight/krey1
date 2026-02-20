@@ -1,30 +1,27 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 interface Props {
   postId: string
   initialLikes: number
-  initialLiked: boolean
-  isAuthed: boolean
 }
 
-export default function LikeButton({ postId, initialLikes, initialLiked, isAuthed }: Props) {
-  const [liked, setLiked] = useState(initialLiked)
+export default function LikeButton({ postId, initialLikes }: Props) {
+  const [liked, setLiked] = useState(false)
   const [count, setCount] = useState(initialLikes)
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('liked_posts') || '[]') as string[]
+    setLiked(stored.includes(postId))
+  }, [postId])
 
   async function toggle() {
-    if (!isAuthed) {
-      router.push('/auth/signin')
-      return
-    }
     setLoading(true)
-    // Optimistic update
-    setLiked(l => !l)
-    setCount(c => liked ? c - 1 : c + 1)
+    const newLiked = !liked
+    setLiked(newLiked)
+    setCount(c => newLiked ? c + 1 : c - 1)
 
     const res = await fetch('/api/likes', {
       method: 'POST',
@@ -33,9 +30,15 @@ export default function LikeButton({ postId, initialLikes, initialLiked, isAuthe
     })
 
     if (!res.ok) {
-      // Revert
-      setLiked(l => !l)
-      setCount(c => liked ? c + 1 : c - 1)
+      setLiked(!newLiked)
+      setCount(c => newLiked ? c - 1 : c + 1)
+    } else {
+      const stored = JSON.parse(localStorage.getItem('liked_posts') || '[]') as string[]
+      if (newLiked) {
+        localStorage.setItem('liked_posts', JSON.stringify([...stored, postId]))
+      } else {
+        localStorage.setItem('liked_posts', JSON.stringify(stored.filter((id: string) => id !== postId)))
+      }
     }
     setLoading(false)
   }
@@ -45,9 +48,7 @@ export default function LikeButton({ postId, initialLikes, initialLiked, isAuthe
       onClick={toggle}
       disabled={loading}
       className={`flex items-center gap-2 text-sm transition-colors ${
-        liked
-          ? 'text-stone-900 font-medium'
-          : 'text-stone-400 hover:text-stone-700'
+        liked ? 'text-stone-900 font-medium' : 'text-stone-400 hover:text-stone-700'
       }`}
     >
       <svg

@@ -4,18 +4,12 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  }
-
-  const { topic, title, body } = await request.json()
+  const { topic, title, body, signature } = await request.json()
 
   if (!topic?.trim() || !title?.trim() || !body?.trim()) {
-    return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+    return NextResponse.json({ error: 'Topic, title, and body are required' }, { status: 400 })
   }
 
-  // Atomically claim the next post number via our Postgres function
   const { data: postNumber, error: fnError } = await supabase.rpc('claim_post_number')
   if (fnError || postNumber === null) {
     return NextResponse.json(
@@ -28,10 +22,10 @@ export async function POST(request: Request) {
     .from('posts')
     .insert({
       post_number: postNumber,
-      author_id: user.id,
       topic: topic.trim(),
       title: title.trim(),
       body: body.trim(),
+      signature: signature?.trim() || null,
     })
     .select('id')
     .single()

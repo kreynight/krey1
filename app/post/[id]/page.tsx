@@ -10,22 +10,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
-
   const { data: post } = await supabase
     .from('posts')
-    .select(`
-      id,
-      post_number,
-      topic,
-      title,
-      body,
-      likes_count,
-      comments_count,
-      created_at,
-      author_id,
-      profiles (username, bio)
-    `)
+    .select('id, post_number, topic, title, body, likes_count, comments_count, created_at, signature')
     .eq('id', id)
     .single()
 
@@ -33,25 +20,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
   const { data: comments } = await supabase
     .from('comments')
-    .select(`
-      id,
-      body,
-      created_at,
-      profiles (username)
-    `)
+    .select('id, body, signature, created_at')
     .eq('post_id', id)
     .order('created_at', { ascending: true })
-
-  const { data: userLike } = user
-    ? await supabase
-        .from('likes')
-        .select('id')
-        .eq('post_id', id)
-        .eq('user_id', user.id)
-        .maybeSingle()
-    : { data: null }
-
-  const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles
 
   return (
     <article>
@@ -71,9 +42,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
           {post.title}
         </h1>
         <div className="mt-3 flex items-center gap-3 text-sm text-stone-400">
-          <Link href={`/profile/${profile?.username}`} className="font-medium text-stone-600 hover:text-stone-900 transition-colors">
-            {profile?.username}
-          </Link>
+          <span className="font-medium text-stone-600">{post.signature || 'Anonymous'}</span>
           <span>·</span>
           <time>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>
         </div>
@@ -86,21 +55,12 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
       {/* Divider */}
       <div className="border-t border-stone-200 pt-6 mb-8 flex items-center gap-6">
-        <LikeButton
-          postId={post.id}
-          initialLikes={post.likes_count}
-          initialLiked={!!userLike}
-          isAuthed={!!user}
-        />
+        <LikeButton postId={post.id} initialLikes={post.likes_count} />
         <span className="text-sm text-stone-400">{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</span>
       </div>
 
       {/* Comments */}
-      <CommentSection
-        postId={post.id}
-        initialComments={comments ?? []}
-        isAuthed={!!user}
-      />
+      <CommentSection postId={post.id} initialComments={comments ?? []} />
     </article>
   )
 }
