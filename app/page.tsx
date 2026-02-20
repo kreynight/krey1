@@ -64,7 +64,7 @@ export default async function FeedPage({
         </h1>
         <p className="text-stone-500 text-base leading-relaxed max-w-lg">
           A space for personal philosophies on specific things. Small talk. Risk. Being late.
-          Quitting. Every post is numbered — there are only 100,000 ever.
+          Quitting. Every post is numbered — there are only 100,000 ever. Write in any language.
         </p>
         {counter && (
           <p className="mt-3 font-mono text-sm text-stone-400">
