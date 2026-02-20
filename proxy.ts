@@ -24,11 +24,14 @@ export async function proxy(request: NextRequest) {
   )
 
   // Refresh session — do not remove this
-  const { data: { user } } = await supabase.auth.getUser()
+  await supabase.auth.getUser()
+
+  // Use getSession for route protection (reads cookie locally, no network call)
+  const { data: { session } } = await supabase.auth.getSession()
 
   // Protect pages that require authentication
   const { pathname } = request.nextUrl
-  if (!user && pathname.startsWith('/new')) {
+  if (!session && pathname.startsWith('/new')) {
     return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
