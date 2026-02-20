@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EditProfileForm from '@/components/EditProfileForm'
 
-export const revalidate = 0
+export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params
