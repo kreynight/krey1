@@ -32,8 +32,16 @@ export default function Navbar() {
       .single()
       .then(({ data }) => { if (data) setCounter(data.current_number) })
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setAuthed(true)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', session.user.id)
+          .single()
+        if (profile) setUsername(profile.username)
+      } else {
         setAuthed(false)
         setUsername(null)
       }

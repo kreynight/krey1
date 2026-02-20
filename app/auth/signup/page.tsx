@@ -3,11 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 export default function SignUpPage() {
   const supabase = createClient()
-  const router = useRouter()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -30,10 +28,9 @@ export default function SignUpPage() {
     // If email confirmation is disabled in Supabase, the session is created
     // immediately and we can redirect. Otherwise, prompt them to check email.
     if (data.session) {
-      router.push('/')
-      router.refresh()
+      window.location.href = '/'
     } else {
-      router.push('/auth/confirm?email=' + encodeURIComponent(email))
+      window.location.href = '/auth/confirm?email=' + encodeURIComponent(email)
     }
   }
 
