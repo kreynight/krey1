@@ -30,25 +30,34 @@ interface Comment {
   created_at: string
 }
 
+const REACTION_LABELS: { key: keyof Post; label: string }[] = [
+  { key: 'agree_count',              label: 'Agree' },
+  { key: 'thought_provoking_count',  label: 'Thought-provoking' },
+  { key: 'appreciate_count',         label: 'Appreciate' },
+  { key: 'curious_count',            label: 'Curious' },
+]
+
 export default function ExpandablePostCard({ post }: { post: Post }) {
   const [expanded, setExpanded] = useState(false)
   const [comments, setComments] = useState<Comment[]>([])
   const [commentsLoaded, setCommentsLoaded] = useState(false)
+  const [commentsCount, setCommentsCount] = useState(post.comments_count)
   const [translatedBody, setTranslatedBody] = useState<string | null>(null)
   const [translating, setTranslating] = useState(false)
   const [shareLabel, setShareLabel] = useState('Share')
 
-  const totalReactions =
-    post.agree_count + post.thought_provoking_count +
-    post.appreciate_count + post.curious_count
+  const reactionPills = REACTION_LABELS
+    .map(r => ({ label: r.label, count: post[r.key] as number }))
+    .filter(r => r.count > 0)
 
   async function toggleExpand() {
     if (!expanded && !commentsLoaded) {
       const res = await fetch(`/api/comments?post_id=${post.id}`)
       if (res.ok) {
-        const data = await res.json()
+        const data: Comment[] = await res.json()
         setComments(data)
         setCommentsLoaded(true)
+        setCommentsCount(data.length)
       }
     }
     setExpanded(v => !v)
@@ -129,6 +138,23 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
             {expanded && translatedBody ? translatedBody : post.body}
           </p>
 
+          {/* Reaction pills — always visible so you can see reactions before expanding */}
+          {reactionPills.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {reactionPills.map(r => (
+                <span
+                  key={r.label}
+                  className="inline-flex items-center gap-1 text-xs text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full"
+                >
+                  {r.label}
+                  <span className="font-mono tabular-nums bg-stone-100 text-stone-500 rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none">
+                    {r.count}
+                  </span>
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="mt-3 flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-stone-400">
             <span className="font-medium">{post.signature || 'Anonymous'}</span>
             {post.city && <span>{post.city}</span>}
@@ -139,16 +165,13 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
                 year: 'numeric',
               })}
             </span>
-            {totalReactions > 0 && (
-              <span>{totalReactions} {totalReactions === 1 ? 'reaction' : 'reactions'}</span>
-            )}
             <button
               onClick={toggleExpand}
               className="hover:text-stone-700 transition-colors"
             >
               {expanded
                 ? '↑ collapse'
-                : `${post.comments_count} ${post.comments_count === 1 ? 'comment' : 'comments'} · expand`}
+                : `${commentsCount} ${commentsCount === 1 ? 'comment' : 'comments'} · expand`}
             </button>
           </div>
 
@@ -184,7 +207,11 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
 
               {/* Comments */}
               <div className="border-t border-stone-100 pt-4">
-                <CommentSection postId={post.id} initialComments={comments} />
+                <CommentSection
+                  postId={post.id}
+                  initialComments={comments}
+                  onCommentAdded={() => setCommentsCount(c => c + 1)}
+                />
               </div>
             </div>
           )}

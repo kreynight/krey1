@@ -12,9 +12,10 @@ interface Comment {
 interface Props {
   postId: string
   initialComments: Comment[]
+  onCommentAdded?: () => void
 }
 
-export default function CommentSection({ postId, initialComments }: Props) {
+export default function CommentSection({ postId, initialComments, onCommentAdded }: Props) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
   const [body, setBody] = useState('')
   const [signature, setSignature] = useState('')
@@ -40,6 +41,7 @@ export default function CommentSection({ postId, initialComments }: Props) {
       setComments(prev => [...prev, data])
       setBody('')
       setSignature('')
+      onCommentAdded?.()
     }
     setLoading(false)
   }
