@@ -33,7 +33,7 @@ export default function ActiveUsers() {
   if (count === null) return null
 
   return (
-    <span className="hidden sm:flex items-center gap-1.5 text-xs text-stone-400 font-mono">
+    <span className="flex items-center gap-1.5 text-xs text-stone-400 font-mono">
       <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
       {count} online
     </span>
