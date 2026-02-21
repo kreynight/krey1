@@ -21,6 +21,30 @@ export default function CommentSection({ postId, initialComments, onCommentAdded
   const [signature, setSignature] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [translations, setTranslations] = useState<Record<string, string>>({})
+  const [translatingId, setTranslatingId] = useState<string | null>(null)
+
+  async function translateComment(comment: Comment) {
+    if (translations[comment.id]) {
+      setTranslations(prev => { const next = { ...prev }; delete next[comment.id]; return next })
+      return
+    }
+    setTranslatingId(comment.id)
+    try {
+      const lang = (navigator.language || 'en').split('-')[0]
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(comment.body)}&langpair=autodetect|${lang}`
+      )
+      const data = await res.json()
+      if (data.responseStatus === 200 && data.responseData?.translatedText) {
+        setTranslations(prev => ({ ...prev, [comment.id]: data.responseData.translatedText }))
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setTranslatingId(null)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -64,7 +88,20 @@ export default function CommentSection({ postId, initialComments, onCommentAdded
                   {new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
-              <p className="text-sm text-stone-600 leading-relaxed">{comment.body}</p>
+              <p className="text-sm text-stone-600 leading-relaxed">
+                {translations[comment.id] ?? comment.body}
+              </p>
+              <button
+                onClick={() => translateComment(comment)}
+                disabled={translatingId === comment.id}
+                className="mt-1 text-[11px] text-stone-400 hover:text-stone-600 transition-colors disabled:opacity-50"
+              >
+                {translatingId === comment.id
+                  ? 'Translating…'
+                  : translations[comment.id]
+                  ? 'Show original'
+                  : 'Translate'}
+              </button>
             </div>
           </div>
         ))}
