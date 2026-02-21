@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import ActiveUsers from '@/components/ActiveUsers'
 
 export default function Navbar() {
   const [counter, setCounter] = useState<number | null>(null)
@@ -25,6 +26,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4 text-sm">
+          <ActiveUsers />
           {counter !== null && (
             <span className="text-stone-400 tabular-nums font-mono text-xs hidden sm:block">
               #{counter.toLocaleString()} left
