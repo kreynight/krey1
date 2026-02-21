@@ -31,7 +31,6 @@ export default async function FeedPage({
     .from('posts')
     .select(`
       id, post_number, topic, body, comments_count, created_at, signature, city,
-      agree_count, thought_provoking_count, appreciate_count, curious_count,
       source_type, confidence_level, debate_intent
     `)
     .order('post_number', { ascending: true })

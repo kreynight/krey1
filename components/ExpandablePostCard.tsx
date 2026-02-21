@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import PostTags from './PostTags'
-import ReactionBar from './ReactionBar'
+import QuickComments from './QuickComments'
 import CommentSection from './CommentSection'
 
 interface Post {
@@ -14,10 +14,6 @@ interface Post {
   created_at: string
   signature: string | null
   city: string | null
-  agree_count: number
-  thought_provoking_count: number
-  appreciate_count: number
-  curious_count: number
   source_type: string | null
   confidence_level: string | null
   debate_intent: string | null
@@ -30,13 +26,6 @@ interface Comment {
   created_at: string
 }
 
-const REACTION_LABELS: { key: keyof Post; label: string }[] = [
-  { key: 'agree_count',              label: 'Agree' },
-  { key: 'thought_provoking_count',  label: 'Thought-provoking' },
-  { key: 'appreciate_count',         label: 'Appreciate' },
-  { key: 'curious_count',            label: 'Curious' },
-]
-
 export default function ExpandablePostCard({ post }: { post: Post }) {
   const [expanded, setExpanded] = useState(false)
   const [comments, setComments] = useState<Comment[]>([])
@@ -45,10 +34,6 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
   const [translatedBody, setTranslatedBody] = useState<string | null>(null)
   const [translating, setTranslating] = useState(false)
   const [shareLabel, setShareLabel] = useState('Share')
-
-  const reactionPills = REACTION_LABELS
-    .map(r => ({ label: r.label, count: post[r.key] as number }))
-    .filter(r => r.count > 0)
 
   async function toggleExpand() {
     if (!expanded && !commentsLoaded) {
@@ -138,23 +123,6 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
             {expanded && translatedBody ? translatedBody : post.body}
           </p>
 
-          {/* Reaction pills — always visible so you can see reactions before expanding */}
-          {reactionPills.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {reactionPills.map(r => (
-                <span
-                  key={r.label}
-                  className="inline-flex items-center gap-1 text-xs text-stone-400 border border-stone-200 px-2 py-0.5 rounded-full"
-                >
-                  {r.label}
-                  <span className="font-mono tabular-nums bg-stone-100 text-stone-500 rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none">
-                    {r.count}
-                  </span>
-                </span>
-              ))}
-            </div>
-          )}
-
           <div className="mt-3 flex items-center flex-wrap gap-x-4 gap-y-1 text-xs text-stone-400">
             <span className="font-medium">{post.signature || 'Anonymous'}</span>
             {post.city && <span>{post.city}</span>}
@@ -194,14 +162,11 @@ export default function ExpandablePostCard({ post }: { post: Post }) {
                 </button>
               </div>
 
-              {/* Reaction bar */}
+              {/* Quick comments */}
               <div className="border-t border-stone-100 pt-4">
-                <ReactionBar
+                <QuickComments
                   postId={post.id}
-                  agreeCount={post.agree_count}
-                  thoughtProvokingCount={post.thought_provoking_count}
-                  appreciateCount={post.appreciate_count}
-                  curiousCount={post.curious_count}
+                  onCommentAdded={() => setCommentsCount(c => c + 1)}
                 />
               </div>
 

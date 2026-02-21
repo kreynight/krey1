@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import ReactionBar from '@/components/ReactionBar'
+import QuickComments from '@/components/QuickComments'
 import CommentSection from '@/components/CommentSection'
 import PostTags from '@/components/PostTags'
 
@@ -15,7 +15,6 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
     .from('posts')
     .select(`
       id, post_number, topic, body, comments_count, created_at, signature, city,
-      agree_count, thought_provoking_count, appreciate_count, curious_count,
       source_type, confidence_level, debate_intent
     `)
     .eq('id', id)
@@ -58,16 +57,9 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         {post.body}
       </div>
 
-      {/* Reactions + comment count */}
-      <div className="border-t border-stone-200 pt-6 mb-8 space-y-3">
-        <ReactionBar
-          postId={post.id}
-          agreeCount={post.agree_count}
-          thoughtProvokingCount={post.thought_provoking_count}
-          appreciateCount={post.appreciate_count}
-          curiousCount={post.curious_count}
-        />
-        <p className="text-xs text-stone-400">{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</p>
+      {/* Quick comments */}
+      <div className="border-t border-stone-200 pt-6 mb-8">
+        <QuickComments postId={post.id} />
       </div>
 
       {/* Comments */}
