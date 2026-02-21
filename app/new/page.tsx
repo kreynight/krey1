@@ -64,6 +64,7 @@ export default function NewPostPage() {
   const [topic, setTopic] = useState('')
   const [body, setBody] = useState('')
   const [signature, setSignature] = useState('')
+  const [city, setCity] = useState('')
   const [sourceType, setSourceType] = useState('')
   const [confidenceLevel, setConfidenceLevel] = useState('')
   const [debateIntent, setDebateIntent] = useState('')
@@ -83,6 +84,7 @@ export default function NewPostPage() {
         topic:            topic.trim(),
         body:             body.trim(),
         signature:        signature.trim() || null,
+        city:             city.trim() || null,
         source_type:      sourceType || null,
         confidence_level: confidenceLevel || null,
         debate_intent:    debateIntent || null,
@@ -183,6 +185,21 @@ export default function NewPostPage() {
             placeholder="How you'd like to be known"
           />
           <p className="mt-1 text-xs text-stone-400">Leave blank to post anonymously</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1.5 text-stone-700" htmlFor="city">
+            City <span className="text-stone-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="city"
+            type="text"
+            maxLength={100}
+            value={city}
+            onChange={e => setCity(e.target.value)}
+            className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-stone-400"
+            placeholder="e.g. Lagos, Tokyo, Buenos Aires"
+          />
         </div>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}

@@ -14,7 +14,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   const { data: post } = await supabase
     .from('posts')
     .select(`
-      id, post_number, topic, body, comments_count, created_at, signature,
+      id, post_number, topic, body, comments_count, created_at, signature, city,
       agree_count, thought_provoking_count, appreciate_count, curious_count,
       source_type, confidence_level, debate_intent
     `)
@@ -47,6 +47,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         />
         <div className="mt-2 flex items-center gap-3 text-sm text-stone-400">
           <span className="font-medium text-stone-600">{post.signature || 'Anonymous'}</span>
+          {post.city && <><span>·</span><span>{post.city}</span></>}
           <span>·</span>
           <time>{new Date(post.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</time>
         </div>
