@@ -45,7 +45,24 @@ export default async function FeedPage({
     query = query.gte('created_at', cutoff)
   }
 
-  const { data: posts } = await query
+  const { data: rawPosts } = await query
+
+  // Overwrite the denormalized comments_count with the real count from the
+  // comments table so the feed always shows an accurate number before expanding.
+  let posts = rawPosts
+  if (rawPosts && rawPosts.length > 0) {
+    const { data: commentRows } = await supabase
+      .from('comments')
+      .select('post_id')
+      .in('post_id', rawPosts.map(p => p.id))
+
+    const countMap = (commentRows ?? []).reduce<Record<string, number>>((acc, row) => {
+      acc[row.post_id] = (acc[row.post_id] ?? 0) + 1
+      return acc
+    }, {})
+
+    posts = rawPosts.map(p => ({ ...p, comments_count: countMap[p.id] ?? 0 }))
+  }
 
   const { data: counter } = await supabase
     .from('post_counter')
